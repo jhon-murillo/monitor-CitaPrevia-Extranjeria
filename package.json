@@ -1,0 +1,16 @@
+{
+  "name": "cita",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.27.2",
+    "axios-cookiejar-support": "^4.0.3",
+    "http-cookie-agent": "^4.0.2",
+    "jquery": "^3.6.0",
+    "jsdom": "^20.0.0",
+    "puppeteer": "^16.1.0",
+    "qs": "^6.11.0",
+    "tough-cookie": "^4.0.0"
+  }
+}
