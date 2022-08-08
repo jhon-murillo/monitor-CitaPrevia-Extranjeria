@@ -3,7 +3,9 @@ const axios = require("axios");
 const jsdom = require("jsdom");
 const https = require("https");
 
-
+const NIE = 'X6571147R';
+const NOMBRE = 'JUAN PABLO';
+const webhook = "https://discord.com/api/webhooks/1005510516787122186/Sm8K1r1VFX1WRccyseCYWB91j_5x5G9DzbSfloWWx3k-fqszzMJC1UYUczKra1xN-Sva";
 // async sleep
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -18,13 +20,12 @@ async function getSession() {
     if (
       url.includes("icp.administracionelectronica.gob.es/icpplustieb/acCitar")
     ) {
-      // console.log(url,body);
       gbody = body;
       var _cookies = await request.client.send("Network.getAllCookies");
-      // console.log(_cookies);
+
       cookies = _cookies.cookies;
     }
-    // if(body)console.log(body);
+    
   });
   await page.goto(
     "https://icp.administracionelectronica.gob.es/icpplustieb/citar?p=8&locale=es",
@@ -82,9 +83,9 @@ async function getSession() {
   await sleep(1000);
   await page.evaluate(() => {
     const nie = document.querySelector("#txtIdCitado");
-    if (nie) nie.value = "X6571147R";
+    if (nie) nie.value = NIE;
     const nombre = document.querySelector("#txtDesCitado");
-    if (nombre) nombre.value = "PEPE MARTINEZ";
+    if (nombre) nombre.value = NOMBRE;
 
     envia();
   });
@@ -101,130 +102,12 @@ async function getSession() {
   });
   await sleep(500);
 
-  // var content = await page._client.send('Network.getAllCookies');
-  // console.log(content);
 
   // sleep
   await browser.close();
   return { gbody, cookies };
 }
 
-async function check_dia(id) {
-  var gbody = "";
-  var cookies = [];
-  const browser = await puppeteer.launch({ headless: false });
-  const page = await browser.newPage();
-  page.on("request", async (request) => {
-    const url = request.url();
-    const body = await request.postData();
-    if (
-      url.includes("icp.administracionelectronica.gob.es/icpplustieb/acCitar")
-    ) {
-      // console.log(url,body);
-      gbody = body;
-      var _cookies = await request.client.send("Network.getAllCookies");
-      // console.log(_cookies);
-      cookies = _cookies.cookies;
-    }
-    // if(body)console.log(body);
-  });
-  await page.goto(
-    "https://icp.administracionelectronica.gob.es/icpplustieb/citar?p=8&locale=es",
-    { waitUntil: "networkidle0" }
-  );
-
-  const options = await page.evaluate(() => {
-    const oficina = document.querySelector(".mf-input__xl");
-    const oficina_options = oficina.querySelectorAll("option");
-    const selected_oficina_option = [...oficina_options].find(
-      (option) => option.value === "99"
-    );
-
-    if (selected_oficina_option) selected_oficina_option.selected = true;
-    cargaTramites();
-
-    return { oficina: oficina_options };
-  });
-  // console.log(options);
-  await page.waitForNavigation({
-    waitUntil: "networkidle0",
-  });
-  await sleep(1000);
-
-  await page.evaluate(() => {
-    const tramite = document.querySelector(".mf-input__l");
-    const tramite_options = tramite.querySelectorAll("option");
-    const selected_tramite_option = [...tramite_options].find(
-      (option) => option.value === "4036"
-    );
-
-    if (selected_tramite_option) selected_tramite_option.selected = true;
-    eliminarSeleccionOtrosGrupos(0);
-    cargaMensajesTramite();
-    return { tramite: tramite_options };
-  });
-  await sleep(1000);
-
-  await page.evaluate(() => {
-    envia();
-  });
-
-  await page.waitForNavigation({
-    waitUntil: "networkidle0",
-  });
-  await sleep(1000);
-
-  await page.evaluate(() => {
-    document.forms[0].submit();
-  });
-
-  await page.waitForNavigation({
-    waitUntil: "networkidle0",
-  });
-  await sleep(1000);
-  await page.evaluate(() => {
-    const nie = document.querySelector("#txtIdCitado");
-    if (nie) nie.value = "X6571147R";
-    const nombre = document.querySelector("#txtDesCitado");
-    if (nombre) nombre.value = "PEPE MARTINEZ";
-
-    envia();
-  });
-  await page.waitForNavigation({
-    waitUntil: "networkidle0",
-  });
-  await sleep(1000);
-
-  await page.evaluate(() => {
-    enviar("solicitud");
-  });
-  await page.waitForNavigation({
-    waitUntil: "networkidle0",
-  });
-  await sleep(500);
-
-  const options = await page.evaluate(() => {
-    const oficina = document.querySelector(".mf-input__xl");
-    const oficina_options = oficina.querySelectorAll("option");
-    const selected_oficina_option = [...oficina_options].find(
-      (option) => option.value === "99"
-    );
-
-    if (selected_oficina_option) selected_oficina_option.selected = true;
-    cargaTramites();
-
-    return { oficina: oficina_options };
-  });
-  // var content = await page._client.send('Network.getAllCookies');
-  // console.log(content);
-
-  // sleep
-  await browser.close();
-  // return { gbody, cookies };
-
-
-
-}
 var citas = [];
 
 async function main() {
@@ -234,8 +117,8 @@ async function main() {
       var cookiesStr = cookies
         .map((cookie) => `${cookie.name}=${cookie.value}`)
         .join("; ");
-      // console.log(gbody);
-      // console.log(cookiesStr);
+
+        
       var config = {
         httpsAgent: new https.Agent({
           rejectUnauthorized: false,
@@ -276,7 +159,7 @@ async function main() {
         ({ gbody, cookies } = await getSession());
         continue;
       }
-      // console.log(response?.status);
+
       const dom = new jsdom.JSDOM(response.data);
       const $ = require("jquery")(dom.window);
       const options = $(".mf-input__xl option");
@@ -284,20 +167,12 @@ async function main() {
         var new_citas = [];
         $.map(options, function (option) {
           new_citas.push({ oficina: option.value, oficina_name: option.text });
-          // citas.find(cita => cita.oficina === option.value) || citas.push({oficina: option.value, tramites: []});
-          // citas[option.value] = option.text;
-          //   console.log(`Cita encontrada: ${option.text}`);
         });
         // spot changes between citas and new_citas, deleted and added
-        var deleted = citas.filter(
-          (cita) =>
-            !new_citas.find((new_cita) => new_cita.oficina === cita.oficina)
-        );
-        var added = new_citas.filter(
-          (new_cita) => !citas.find((cita) => cita.oficina === new_cita.oficina)
-        );
-        // var deleted = citas.filter((cita) => !new_citas.includes(cita.oficina));
-        // var added = new_citas.filter((cita) => !citas.includes(cita.oficina));
+        var deleted = citas.filter((cita) => !new_citas.find((new_cita) => new_cita.oficina === cita.oficina));
+        var added = new_citas.filter((new_cita) => !citas.find((cita) => cita.oficina === new_cita.oficina));
+
+        
         var date = new Date().toLocaleString();
 
         citas = new_citas;
@@ -306,12 +181,10 @@ async function main() {
 
         if(added.length || deleted.length) {
             // send webhook discord axios
-            if(cita.oficina_name.includes("GRANADOS, MALLORCA, 213")){
-              check_dia(cita.oficina);
-            }
+
             const webhook = {
                 method: "post",
-                url: "https://discord.com/api/webhooks/1005510516787122186/Sm8K1r1VFX1WRccyseCYWB91j_5x5G9DzbSfloWWx3k-fqszzMJC1UYUczKra1xN-Sve",
+                url: webhook,
                 headers: {
                     "Content-Type": "application/json",
                     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.134 Safari/537.36",
@@ -326,21 +199,16 @@ async function main() {
             
 
         }
-        // console.log(`Numero de citas: ${citas.length}`);
-        // print citas in a list (1 - ...)
+
+        
         console.log(
           `[${date}] -> Citas: ${citas
             .map((cita, index) => `${index + 1} - ${cita.oficina_name}`)
             .join("\n")}`
         );
       }
-      // var citas_diff = citas.filter(cita => !new_citas.includes(cita));
-      // citas_diff.forEach(cita => {
-      //     console.log(`Cita eliminada: ${cita}`);
-      // }
-      // );
-      // citas = new_citas;
-      // console.log(`Citas actuales: ${citas.length}`);
+
+      
 
       const res = $(".mf-msg__info").text();
       if (res) {
@@ -362,15 +230,14 @@ async function main() {
         else {
           // print datetimetime and response
           console.log(`[${date}] -> ${res}`);
-          // console.log(res);
-          // console.log('Cita reservada');
+
+          
         }
       }
     } catch (error) {
       console.log("error: " + (error?.message || error?.status));
-      if (error?.status === 429) console.log(`[${date}] -> CHANGE IP`);
+      if (error?.status === 429) console.log(`[${date}] -> BAN CHANGE IP`);
       await sleep(35 * 1000);
-      continue;
       console.log(`[${date}] -> generating new headers`);
       ({ gbody, cookies } = await getSession());
       continue;
