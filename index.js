@@ -3,8 +3,6 @@ const axios = require("axios");
 const jsdom = require("jsdom");
 const https = require("https");
 
-const NIE = 'X6571147R';
-const NOMBRE = 'JUAN PABLO';
 const gwebhook = "https://discord.com/api/webhooks/1005510516787122186/Sm8K1r1VFX1WRccyseCYWB91j_5x5G9DzbSfloWWx3k-fqszzMJC1UYUczKra1xN-Sva";
 // async sleep
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -12,7 +10,7 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 async function getSession() {
   var gbody = "";
   var cookies = [];
-  const browser = await puppeteer.launch({ headless: false });
+  const browser = await puppeteer.launch({ headless: true });
   const page = await browser.newPage();
   page.on("request", async (request) => {
     const url = request.url();
@@ -83,9 +81,9 @@ async function getSession() {
   await sleep(1000);
   await page.evaluate(() => {
     const nie = document.querySelector("#txtIdCitado");
-    if (nie) nie.value = NIE;
+    if (nie) nie.value = 'X6571147R';
     const nombre = document.querySelector("#txtDesCitado");
-    if (nombre) nombre.value = NOMBRE;
+    if (nombre) nombre.value = 'JUAN PABLO';
 
     envia();
   });
@@ -166,7 +164,7 @@ async function main() {
       if (options.length > 0) {
         var new_citas = [];
         $.map(options, function (option) {
-          new_citas.push({ oficina: option.value, oficina_name: option.text });
+          if(!option.text.includes('Seleccionar')) new_citas.push({ oficina: option.value, oficina_name: option.text });
         });
         // spot changes between citas and new_citas, deleted and added
         var deleted = citas.filter((cita) => !new_citas.find((new_cita) => new_cita.oficina === cita.oficina));
@@ -181,7 +179,7 @@ async function main() {
 
         if(added.length || deleted.length) {
             // send webhook discord axios
-
+          try{
             const webhook = {
                 method: "post",
                 url: gwebhook,
@@ -196,14 +194,18 @@ async function main() {
                 },
             };
             await axios(webhook);
+          }
+          catch(error){
+            console.log('webhook error:',(error?.message || error?.status));
+          }
             
 
         }
-
+        
         
         console.log(
-          `[${date}] -> Citas: ${citas
-            .map((cita, index) => `${index + 1} - ${cita.oficina_name}`)
+          `[${date}] -> Citas:\n ${citas
+            .map((cita, index) => `\t${index + 1} - ${cita.oficina_name}`)
             .join("\n")}`
         );
       }
