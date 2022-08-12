@@ -5,7 +5,7 @@ const https = require("https");
 
 const NIE = 'X6571147R';
 const NOMBRE = 'JUAN PABLO';
-const webhook = "https://discord.com/api/webhooks/1005510516787122186/Sm8K1r1VFX1WRccyseCYWB91j_5x5G9DzbSfloWWx3k-fqszzMJC1UYUczKra1xN-Sva";
+const gwebhook = "https://discord.com/api/webhooks/1005510516787122186/Sm8K1r1VFX1WRccyseCYWB91j_5x5G9DzbSfloWWx3k-fqszzMJC1UYUczKra1xN-Sva";
 // async sleep
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -184,7 +184,7 @@ async function main() {
 
             const webhook = {
                 method: "post",
-                url: webhook,
+                url: gwebhook,
                 headers: {
                     "Content-Type": "application/json",
                     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.134 Safari/537.36",
