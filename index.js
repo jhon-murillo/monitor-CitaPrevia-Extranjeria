@@ -26,7 +26,7 @@ async function getSession() {
     
   });
   await page.goto(
-    "https://icp.administracionelectronica.gob.es/icpplustieb/citar?p=8&locale=es",
+    "https://icp.administracionelectronica.gob.es/icpplustieb/citar?p=12&locale=es",
     { waitUntil: "networkidle0" }
   );
 
@@ -42,7 +42,7 @@ async function getSession() {
 
     return { oficina: oficina_options };
   });
-  // console.log(options);
+  console.log(options);
   await page.waitForNavigation({
     waitUntil: "networkidle0",
   });
@@ -52,7 +52,7 @@ async function getSession() {
     const tramite = document.querySelector(".mf-input__l");
     const tramite_options = tramite.querySelectorAll("option");
     const selected_tramite_option = [...tramite_options].find(
-      (option) => option.value === "4036"
+      (option) => option.value === "4010"
     );
 
     if (selected_tramite_option) selected_tramite_option.selected = true;
