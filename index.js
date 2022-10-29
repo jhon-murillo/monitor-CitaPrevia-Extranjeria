@@ -38,7 +38,7 @@ async function getSession() {
     );
 
     if (selected_oficina_option) selected_oficina_option.selected = true;
-    cargaTramites();
+    cargaMensajesTramite();
 
     return { oficina: oficina_options };
   });
